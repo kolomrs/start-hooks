@@ -3,32 +3,40 @@ import CollapseWrapper from "../common/collapse";
 import Divider from "../common/divider";
 import PropTypes from "prop-types";
 
-const SimpleComponent = ({ onLogin, onLogOut, isAuth }) => {
-    return isAuth ? (
-        <button className="btn btn-primary" onClick={onLogOut}>
+const SimpleComponent = ({ handleAuth, handleLogOut, isLogin }) => {
+    return isLogin ? (
+        <button className="btn btn-primary" onClick={handleLogOut}>
             Выйти из системы
         </button>
     ) : (
-        <button className="btn btn-primary" onClick={onLogin}>
+        <button className="btn btn-primary" onClick={handleAuth}>
             Войти в систему
         </button>
     );
 };
 SimpleComponent.propTypes = {
-    onLogin: PropTypes.func,
-    onLogOut: PropTypes.func,
-    isAuth: PropTypes.bool
+    handleAuth: PropTypes.func,
+    handleLogOut: PropTypes.func,
+    isLogin: PropTypes.bool
 };
 
 const WithFunctions = (Component) => (props) => {
-    const isLogin = localStorage.getItem("auth");
+    const isLogin = !!localStorage.getItem("auth");
 
     const handleAuth = () => {
-        localStorage.setItem("auth");
+        localStorage.setItem("auth", "token");
     };
     const handleLogOut = () => {
         localStorage.removeItem("auth");
     };
+    return (
+        <Component
+            isLogin={isLogin}
+            handleAuth={handleAuth}
+            handleLogOut={handleLogOut}
+            {...props}
+        />
+    );
 };
 
 const HocExercise = () => {
