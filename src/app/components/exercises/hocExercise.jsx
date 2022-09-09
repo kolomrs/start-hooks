@@ -1,46 +1,54 @@
 import React from "react";
 import CollapseWrapper from "../common/collapse";
-import Divider from "../common/divider";
 import PropTypes from "prop-types";
+import Divider from "../common/divider";
+import SmallTitle from "../common/typografy/smallTitle";
+import CardWrapper from "../common/Card";
 
-const SimpleComponent = ({ handleAuth, handleLogOut, isLogin }) => {
-    return isLogin ? (
-        <button className="btn btn-primary" onClick={handleLogOut}>
+// Simple Component
+const SimpleComponent = ({onLogin, onLogOut, isAuth}) => {
+    return isAuth ? (
+        <button className="btn btn-secondary" onClick={onLogOut}>
             Выйти из системы
         </button>
     ) : (
-        <button className="btn btn-primary" onClick={handleAuth}>
-            Войти в систему
+        <button className="btn btn-primary" onClick={onLogin}>
+            Войти
         </button>
     );
 };
+
 SimpleComponent.propTypes = {
-    handleAuth: PropTypes.func,
-    handleLogOut: PropTypes.func,
-    isLogin: PropTypes.bool
+    onLogin: PropTypes.func,
+    onLogOut: PropTypes.func,
+    isAuth: PropTypes.bool,
 };
 
-const WithFunctions = (Component) => (props) => {
-    const isLogin = !!localStorage.getItem("auth");
-
-    const handleAuth = () => {
+// HOC Component
+const withFunctions = Component => props => {
+    const handleLogin = () => {
         localStorage.setItem("auth", "token");
     };
-    const handleLogOut = () => {
+    const handleLogout = () => {
         localStorage.removeItem("auth");
     };
+    const isAuth = !!localStorage.getItem("auth");
+
     return (
-        <Component
-            isLogin={isLogin}
-            handleAuth={handleAuth}
-            handleLogOut={handleLogOut}
-            {...props}
-        />
+        <CardWrapper>
+            <Component
+                isAuth={isAuth}
+                onLogOut={handleLogout}
+                onLogin={handleLogin}
+                {...props}
+            />
+        </CardWrapper>
     );
 };
+// Component with HOC
+const ComponentWithHoc = withFunctions(SimpleComponent);
 
 const HocExercise = () => {
-    const ComponentWithHoc = WithFunctions(SimpleComponent);
     return (
         <CollapseWrapper title="Упражнение">
             <p className="mt-3">
@@ -116,10 +124,8 @@ const HocExercise = () => {
                 страницы
             </p>
             <Divider />
+            <SmallTitle>Решение</SmallTitle>
             <ComponentWithHoc />
-            <div>
-                <input className="form-control mb-4"></input>
-            </div>
         </CollapseWrapper>
     );
 };

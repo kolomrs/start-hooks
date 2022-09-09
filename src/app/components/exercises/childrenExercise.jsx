@@ -1,17 +1,8 @@
 import React from "react";
+import PropTypes from "prop-types";
 import CollapseWrapper from "../common/collapse";
-
-const NumberList = ({ children }) => {
-    return React.Children.map(children, (child, i) => {
-        return (
-            <>
-                <div className="d-flex">
-                    <div>{i + 1}</div> {child}
-                </div>
-            </>
-        );
-    });
-};
+import Divider from "../common/divider";
+import SmallTitle from "../common/typografy/smallTitle";
 
 const ChildrenExercise = () => {
     return (
@@ -23,17 +14,38 @@ const ChildrenExercise = () => {
                 <code>React.Children.map</code> так и{" "}
                 <code>React.Children.toArray</code>
             </p>
-            <NumberList>
+            <Divider />
+            <SmallTitle>Решение</SmallTitle>
+
+            <ComponentsList>
                 <Component />
                 <Component />
                 <Component />
-            </NumberList>
+            </ComponentsList>
         </CollapseWrapper>
     );
 };
-
-const Component = () => {
-    return <div>Компонент списка</div>;
+const ComponentsList = ({ children }) => {
+    const arrayOfChildren = React.Children.toArray(children);
+    console.log(arrayOfChildren);
+    return React.Children.map(arrayOfChildren, (child) =>
+        React.cloneElement(child, {
+            ...child.props,
+            num: +child.key.replace(".", "") + 1
+        })
+    );
 };
-
+ComponentsList.propTypes = {
+    children: PropTypes.oneOfType([
+        PropTypes.arrayOf(PropTypes.node),
+        PropTypes.node
+    ])
+};
+const Component = ({ num }) => {
+    console.log(num);
+    return <div>{num} Компонент списка</div>;
+};
+Component.propTypes = {
+  num: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
+};
 export default ChildrenExercise;
